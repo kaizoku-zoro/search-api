@@ -57,36 +57,52 @@ function calc_similarity(a, b) {
     if (sum3 == 0) return 0
     return sum / sum3
 }
-const getProblem = (i)=>{
-    return {title:ps_titles[top5_questions[i]-1],code:ps_codes[top5_questions[i]-1],url:ps_urls[top5_questions[i]-1],difficulty:parseInt(ps_difficulties[top5_questions[i]-1]),submissions:parseInt(ps_submissions[top5_questions[i]-1])};
+const getProblem = (i) => {
+    return { title: ps_titles[i - 1], code: ps_codes[i - 1], url: ps_urls[i - 1], difficulty: parseInt(ps_difficulties[i - 1]), submissions: parseInt([i - 1]) };
 }
 
-const queryProblem= (q,param='submissions',incr=false) => {
+const queryProblem = (q, param = 'submissions', incr = false) => {
     query_tfidf = return_query_tfidf(q)
     all_questions = []
     for (let i = 0; i < 1450; i++) {
-      let cur_tfidf = tfidf[i]
-      similarity_value = calc_similarity(query_tfidf, cur_tfidf)
-      all_questions.push([similarity_value, i])
+        let cur_tfidf = tfidf[i]
+        similarity_value = calc_similarity(query_tfidf, cur_tfidf)
+        all_questions.push([similarity_value, i])
     }
     all_questions.sort((a, b) => (a[0] > b[0] ? -1 : 1))
     top5_questions = []
     for (let i = 0; i < 5; i++) {
-      top5_questions.push(all_questions[i][1] + 1)
+        top5_questions.push(all_questions[i][1] + 1)
     }
     questions = [];
-    for(let i in top5_questions){
-        questions.push(getProblem(i));
+    for (let i in top5_questions) {
+        console.log(top5_questions[i]);
+        questions.push(getProblem(top5_questions[i]));
     }
-    questions = questions.sort((a,b)=>{
-        if(incr)
-            return (a[param]>b[param]?-1:1);
+    questions = questions.sort((a, b) => {
+        if (incr)
+            return (a[param] > b[param] ? -1 : 1);
         else
-            return (a[param]<b[param]?-1:1);
+            return (a[param] < b[param] ? -1 : 1);
     })
     return questions;
-  }
+}
+const all = [];
+for (let i = 1; i < 1450; i++) {
+    all.push(getProblem(i));
+}
 
-module.exports = {queryProblem};
+// const top10 = (param='submissions') => {
+//     all_questions = all_questions.sort((a, b) => {
+//         if (incr)
+//             return (a[param] > b[param] ? -1 : 1);
+//         else
+//             return (a[param] < b[param] ? -1 : 1);
+//     })
+//     console.log(all_questions)
+//     return all_questions.slice(0,10+1);
+// }
+
+module.exports = { queryProblem,all };
 
 
