@@ -61,7 +61,7 @@ const getProblem = (i) => {
     return { title: ps_titles[i - 1], code: ps_codes[i - 1], url: ps_urls[i - 1], difficulty: parseInt(ps_difficulties[i - 1]), submissions: parseInt([i - 1]) };
 }
 
-const queryProblem = (q, param = 'submissions', incr = false) => {
+const queryProblem = (q, param = 'submissions') => {
     query_tfidf = return_query_tfidf(q)
     all_questions = []
     for (let i = 0; i < 1450; i++) {
@@ -71,26 +71,28 @@ const queryProblem = (q, param = 'submissions', incr = false) => {
     }
     all_questions.sort((a, b) => (a[0] > b[0] ? -1 : 1))
     top5_questions = []
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
         top5_questions.push(all_questions[i][1] + 1)
     }
     questions = [];
     for (let i in top5_questions) {
-        console.log(top5_questions[i]);
         questions.push(getProblem(top5_questions[i]));
     }
     questions = questions.sort((a, b) => {
-        if (incr)
             return (a[param] > b[param] ? -1 : 1);
-        else
-            return (a[param] < b[param] ? -1 : 1);
     })
     return questions;
 }
-const all = [];
+let sub = [];
 for (let i = 1; i < 1450; i++) {
-    all.push(getProblem(i));
+    sub.push(getProblem(i));
 }
+sub = sub.sort((a,b)=>{
+    return (a['submissions'] > b['submissions'] ? -1 : 1);
+})
+const diff = sub.sort((a,b)=>{
+    return (a['difficulty'] > b['difficulty'] ? -1 : 1);
+})
 
 // const top10 = (param='submissions') => {
 //     all_questions = all_questions.sort((a, b) => {
@@ -103,6 +105,6 @@ for (let i = 1; i < 1450; i++) {
 //     return all_questions.slice(0,10+1);
 // }
 
-module.exports = { queryProblem,all };
+module.exports = { queryProblem,diff,sub };
 
 
