@@ -24,14 +24,11 @@ function return_query_tfidf(q) {
         if (dict.search(query_keywords[j])[0] != undefined)
             query_keywords[j] = dict.search(query_keywords[j])[0].word
     }
-    console.log('query after stemming and lemetization', query_keywords)
     query_tf = []
     for (let j = 0; j < final_kw.length; j++) {
         query_tf.push(0)
     }
-    if (query_keywords.length == 0) {
-        console.log('query_keyword length is 0')
-    }
+
     for (let j = 0; j < query_keywords.length; j++) {
         if (final_kw.indexOf(query_keywords[j]) != -1)
             query_tf[final_kw.indexOf(query_keywords[j])] += 1
@@ -44,7 +41,6 @@ function return_query_tfidf(q) {
     return query_tfidf
 }
 
-console.log(return_query_tfidf("chef and eggs").length)
 
 function calc_similarity(a, b) {
     sum = 0
@@ -61,8 +57,11 @@ function calc_similarity(a, b) {
     if (sum3 == 0) return 0
     return sum / sum3
 }
+const getProblem = (i)=>{
+    return {title:ps_titles[top5_questions[i]-1],code:ps_codes[top5_questions[i]-1],url:ps_urls[top5_questions[i]-1],difficulty:parseInt(ps_difficulties[top5_questions[i]-1]),submissions:parseInt(ps_submissions[top5_questions[i]-1])};
+}
 
-const top5= (q) => {
+const queryProblem= (q,param='submissions',incr=false) => {
     query_tfidf = return_query_tfidf(q)
     all_questions = []
     for (let i = 0; i < 1450; i++) {
@@ -75,9 +74,19 @@ const top5= (q) => {
     for (let i = 0; i < 5; i++) {
       top5_questions.push(all_questions[i][1] + 1)
     }
-    return top5_questions
+    questions = [];
+    for(let i in top5_questions){
+        questions.push(getProblem(i));
+    }
+    questions = questions.sort((a,b)=>{
+        if(incr)
+            return (a[param]>b[param]?-1:1);
+        else
+            return (a[param]<b[param]?-1:1);
+    })
+    return questions;
   }
 
-  console.log(top5("chef eat rice"))
+module.exports = {queryProblem};
 
 
